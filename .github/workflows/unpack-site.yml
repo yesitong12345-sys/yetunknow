@@ -11,16 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Unpack uploaded website
+      - name: Extract Windows ZIP
+        continue-on-error: true
+        run: unzip -o living-desk-github-vercel-windows.zip -d .
+      - name: Verify and publish website
         shell: bash
         run: |
-          set -u
-          archive="living-desk-github-vercel-windows.zip"
-          test -f "$archive"
-          unzip -o "$archive" -d .
-          unzip_status=$?
-          if [ "$unzip_status" -gt 1 ]; then exit "$unzip_status"; fi
-          rm "$archive"
+          set -euo pipefail
+          test -f app/page.tsx
+          test -f package.json
+          test -f vercel.json
+          rm -f living-desk-github-vercel-windows.zip
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
